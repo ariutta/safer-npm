@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+
+# see https://stackoverflow.com/a/246128/5354298
+get_script_dir() { echo "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"; }
+SCRIPT_DIR=$(get_script_dir)
+
+IPTABLES_LKG_PATH="/tmp/iptables.lkg"
+
+cleanup() {
+  if [ -e "$IPTABLES_LKG_PATH" ]; then
+	if ! sudo -n true 2>/dev/null; then 
+		echo ""
+		echo ""
+		echo "Sudo needed again in order to restore iptables to their previous state."
+		echo ""
+	fi
+
+  	sudo iptables-restore "$IPTABLES_LKG_PATH"
+  	rm "$IPTABLES_LKG_PATH"
+  fi
+}
+
+# Based on http://linuxcommand.org/lc3_wss0140.php
+# and https://codeinthehole.com/tips/bash-error-reporting/
+PROGNAME=$(basename $0)
+error_exit() {
+#	----------------------------------------------------------------
+#	Function for exit due to fatal program error
+#		Accepts 1 argument:
+#			string containing descriptive error message
+#	----------------------------------------------------------------
+
+
+  #echo "${PROGNAME}: ${1:-"Unknown Error"}" 1>&2
+  if [ ! "$1" ]; then
+    echo "${PROGNAME}: Unknown Error" 1>&2
+    read line file <<<$(caller)
+    echo "An error occurred in line $line of file $file:" 1>&2
+    sed "${line}q;d" "$file" 1>&2
+  else
+    echo "${PROGNAME}: $1" 1>&2
+  fi
+
+  cleanup
+  exit 1
+}
+
+#trap error_exit ERR
+trap cleanup EXIT INT QUIT TERM
+
+PWD="$(pwd)"
+if [ ! -e "$PWD/package.json" ]; then
+	echo "safernpm only works inside a dir containing a package.json"
+	exit 1
+fi
+
+# TODO: we need to elevated to sudo for iptables.
+# How does that affect anything else run from this script?
+# Note that test.sh below can run a sudo command.
+
+if ! sudo -n true 2>/dev/null; then 
+	echo ""
+	echo "We need sudo in order to tell iptables to only allow network connections for approved domains."
+	echo "Your iptables will be restored when process completes."
+	echo ""
+fi
+sudo iptables-save > "$IPTABLES_LKG_PATH"
+sudo bash "$SCRIPT_DIR/npm-only.sh"
+
+#bash "$SCRIPT_DIR/test.sh"
+
+export NSNAIL_NODE_PATH="$(which node)"
+export NSJAIL_NODE_MODULES_PARENT_DIR="$PWD"
+
+nsjail --config "$SCRIPT_DIR/npm.cfg" --cwd "$HOME/project" -- "$(which npm)" "$@"
+#nsjail --config "$SCRIPT_DIR/npm.cfg" --cwd "$HOME/project" -- "$(which bash)" "$@"
+
+unset NSJAIL_NODE_MODULES_PARENT_DIR
+unset NSNAIL_NODE_PATH
