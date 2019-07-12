@@ -1,6 +1,61 @@
+# Safer NPM
+
+Limit NPM to just the capabilities it needs. Get the benefits of `--ignore-scripts` without the drawbacks.
+
+## Installation
+
+```
+nix-env -iA nixos.safernpm
+```
+
+TODO: how do users get `dotfiles`? I'm currently symlinking.
+TODO: how do users get a `shell.nix` into their NPM project?
+
+## Usage
+
+`cd` into your NPM project, then run:
+
 ```
 (clear; nix-shell --pure --command 'export PATH="/run/wrappers/bin:/run/current-system/sw/bin:$PATH"; return')
+safernpm --help
 ```
+
+## Development
+
+```
+git clone ...
+cd safernpm
+ln -s $HOME/dotfiles ./dotfiles
+```
+
+* `cd` into your NPM project directory
+* add a `shell.nix` file that references `$HOME/Documents/safernpm/dev-deps.nix`
+* launch `safernpm`:
+
+```
+(clear; nix-shell --pure --command 'export PATH="/run/wrappers/bin:/run/current-system/sw/bin:$PATH"; return')
+$HOME/Documents/safernpm/npm install
+```
+
+Exit with `ctrl-d`.
+
+## TODO
+
+I symlinked default.nix to shell.nix. If I run `$HOME/Documents/safernpm/npm --help` in
+a directory with a `shell.nix`, it asks for a `default.nix`. But if I run the same thing
+in a directory without a `shell.nix`, it asks for a `shell.nix`. What's up with that?
+Should I specify `./shell.nix` in the `npm` file shebang?
+
+Look into using BPF and XDP:
+https://news.ycombinator.com/item?id=20412395
+https://blog.jessfraz.com/post/linux-observability-with-bpf/
+
+bpf is on nixos:
+```
+nix-env -iA nixos.linuxPackages.bpftrace
+```
+
+Not sure about XDP.
 
 TODO: do we need to golist the following?
 host 10.1.100.65

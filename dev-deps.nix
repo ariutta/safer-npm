@@ -1,14 +1,15 @@
 with import <nixpkgs> { config.allowUnfree = true; };
-let
-  dev-env-js = import ./dotfiles/nix-dev-envs/node.nix;
-  custom = import ./dotfiles/nixpkgs-custom/all-custom.nix;
-in dev-env-js ++ [
-  sudo
-  which
+[
+  pkgs.coreutils
 
-  pkgs.wireshark # to see when npm restrictor fails
+  pkgs.nodejs-8_x
 
-  pkgs.libxml2 # for xmllint
+  pkgs.nsjail
+
+  #pkgs.sudo
+  #pkgs.which
+
+  #pkgs.wireshark # to see when npm restrictor fails
 
   # node-gyp dependencies
   # see https://github.com/nodejs/node-gyp#on-unix
