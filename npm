@@ -61,7 +61,8 @@ fi
 
 if ! sudo -n true 2>/dev/null; then 
 	echo ""
-	echo "We need sudo in order to tell iptables to only allow network connections for approved domains."
+	echo "We need sudo in order to create any directories required by npm and nsjail"
+	echo "and to set iptables to only allow network connections for approved domains."
 	echo "Your iptables will be restored when process completes."
 	echo ""
 fi
@@ -69,6 +70,29 @@ sudo iptables-save > "$IPTABLES_LKG_PATH"
 sudo bash "$SCRIPT_DIR/npm-only.sh"
 
 #bash "$SCRIPT_DIR/test.sh"
+
+# make directories needed by npm
+mkdir -p "$HOME/.node-gyp"
+mkdir -p "$HOME/.npm"
+mkdir -p "$HOME/.config/configstore"
+
+# make directories needed by nsjail
+if [ ! -e "/sys/fs/cgroup/cpu/NSJAIL" ]; then
+	sudo mkdir -p "/sys/fs/cgroup/cpu/NSJAIL"
+	sudo chown -R $USER "/sys/fs/cgroup/cpu/NSJAIL"
+fi
+if [ ! -e "/sys/fs/cgroup/memory/NSJAIL" ]; then
+	sudo mkdir -p "/sys/fs/cgroup/memory/NSJAIL"
+	sudo chown -R $USER "/sys/fs/cgroup/memory/NSJAIL"
+fi
+if [ ! -e "/sys/fs/cgroup/net_cls/NSJAIL" ]; then
+	sudo mkdir -p "/sys/fs/cgroup/net_cls/NSJAIL"
+	sudo chown -R $USER "/sys/fs/cgroup/net_cls/NSJAIL"
+fi
+if [ ! -e "/sys/fs/cgroup/pids/NSJAIL" ]; then
+	sudo mkdir -p "/sys/fs/cgroup/pids/NSJAIL"
+	sudo chown -R $USER "/sys/fs/cgroup/pids/NSJAIL"
+fi
 
 export NSNAIL_NODE_PATH="$(which node)"
 export NSJAIL_NODE_MODULES_PARENT_DIR="$PWD"
