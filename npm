@@ -94,10 +94,8 @@ if [ ! -e "/sys/fs/cgroup/pids/NSJAIL" ]; then
 	sudo chown -R $USER "/sys/fs/cgroup/pids/NSJAIL"
 fi
 
-export NSNAIL_NODE_PATH="$(which node)"
 export NSJAIL_NODE_MODULES_PARENT_DIR="$PWD"
 
 nsjail --config "$SCRIPT_DIR/npm.cfg" --cwd "$HOME/project" -- "$(which npm)" "$@"
 
 unset NSJAIL_NODE_MODULES_PARENT_DIR
-unset NSNAIL_NODE_PATH

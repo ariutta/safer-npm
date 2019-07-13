@@ -1,26 +1,24 @@
 with import <nixpkgs> { config.allowUnfree = true; };
 [
+  #pkgs.wireshark # to see when npm restrictor fails
+
   pkgs.coreutils
 
   pkgs.nodejs-8_x
 
   pkgs.nsjail
 
-  #pkgs.sudo
-  #pkgs.which
-
-  #pkgs.wireshark # to see when npm restrictor fails
-
-  # node-gyp dependencies
-  # see https://github.com/nodejs/node-gyp#on-unix
-  # (Required for building node-expat)
+  # node-gyp dependencies (node-gyp compiles C/C++ Addons)
+  #   see https://github.com/nodejs/node-gyp#on-unix
   pkgs.python2
 
 ] ++ (if stdenv.isDarwin then [
+
   # more node-gyp dependencies
   # XCode Command Line Tools
   # TODO: do we need cctools?
   #pkgs.darwin.cctools
+
 ] else [
 
   # more node-gyp dependencies
