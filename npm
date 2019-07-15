@@ -51,7 +51,7 @@ trap cleanup EXIT INT QUIT TERM
 
 PWD="$(pwd)"
 if [ ! -e "$PWD/package.json" ]; then
-	echo "safernpm only works inside a dir containing a package.json"
+	echo "safer-npm only works inside a dir containing a package.json"
 	exit 1
 fi
 

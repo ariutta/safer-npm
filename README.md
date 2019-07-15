@@ -1,47 +1,42 @@
 # Safer NPM
 
-Limit NPM to just the capabilities it needs. Get the benefits of `--ignore-scripts` without the drawbacks.
+Limit NPM to just the capabilities it needs. Get the benefits of `--ignore-scripts` without the drawbacks. Currently only works on NixOS.
 
 ## Installation
 
-```
-nix-env -iA nixos.safernpm
-```
+Install [Nix](https://nixos.org/nix/download.html).
 
-TODO: how do users get `dotfiles`? I'm currently symlinking.
-TODO: how do users get a `shell.nix` into their NPM project?
+Get this repo:
+```
+git clone https://www.github.com/ariutta/safer-npm $HOME/safer-npm
+```
 
 ## Usage
 
-`cd` into your NPM project, then run:
+In your NPM project directory, create a `shell.nix` file that references `$HOME/safer-npm/dev-deps.nix`:
 
 ```
-(clear; nix-shell --pure --command 'export PATH="/run/wrappers/bin:/run/current-system/sw/bin:$PATH"; return')
-safernpm --help
+cp "$HOME/safer-npm/sample-shell.nix" ./shell.nix
 ```
 
-## Development
+* launch the environment for `safer-npm` and try it out:
 
 ```
-git clone ...
-cd safernpm
-ln -s $HOME/dotfiles ./dotfiles
-```
-
-* `cd` into your NPM project directory
-* add a `shell.nix` file that references `$HOME/Documents/safernpm/dev-deps.nix`
-* launch `safernpm`:
-
-```
-(clear; nix-shell --pure --command 'export PATH="/run/wrappers/bin:/run/current-system/sw/bin:$PATH"; return')
-$HOME/Documents/safernpm/npm install
+nix-shell
+which npm # you should see $HOME/safer-npm/npm
+npm --help
 ```
 
 Exit with `ctrl-d`.
 
 ## TODO
 
-I symlinked default.nix to shell.nix. If I run `$HOME/Documents/safernpm/npm --help` in
+TODO: the following does not work yet. Need to publish to nixpkgs.
+```
+nix-env -iA nixos.safer-npm
+```
+
+I symlinked default.nix to shell.nix. If I run `$HOME/Documents/safer-npm/npm --help` in
 a directory with a `shell.nix`, it asks for a `default.nix`. But if I run the same thing
 in a directory without a `shell.nix`, it asks for a `shell.nix`. What's up with that?
 Should I specify `./shell.nix` in the `npm` file shebang?
