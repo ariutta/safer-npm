@@ -22,7 +22,7 @@ cp "$HOME/safer-npm/sample-shell.nix" ./shell.nix
 * launch the environment for `safer-npm` and try it out:
 
 ```
-nix-shell
+nix-shell --pure
 which npm # you should see $HOME/safer-npm/npm
 npm --help
 ```
